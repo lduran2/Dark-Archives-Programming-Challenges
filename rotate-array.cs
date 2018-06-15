@@ -137,7 +137,8 @@ namespace DarkArchives {
 				 * Calculates the specified element from the original matrix
 				 */
 				public T Get(int iRow, int iCol) {
-					/* a 90 degree rotate is reversing the */
+					/* a 90 degree rotate is equivalent reversing the rows and
+					   swapping the coordinates of row and column              */
 					return this.parent.Get((this.parent.nRows() - iCol - 1), iRow);
 				} /* end T Get(int, int) */
 
