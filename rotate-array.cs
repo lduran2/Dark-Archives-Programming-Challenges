@@ -40,13 +40,7 @@ class RotateArrayTest {
 	} /* end static void Main(string[]) */
 } /* end class RotateArray */
 
-/**
- * Programming challenges
- */
 namespace DarkArchives {
-	/**
-	 * My solutions
-	 */
 	namespace Lduran2 {
 		/**
 		 * Classes dealing with matrices.
@@ -166,7 +160,7 @@ namespace DarkArchives {
 			 * A writable for a backing matrix
 			 */
 			sealed class MatrixWriteable<T> : Writeable {
-				Matrix<T> matrix; /* the backing matrix */
+				Matrix<T> matrix; /** the backing matrix */
 
 				/**
 				 * Creates a writable from a backing matrix
