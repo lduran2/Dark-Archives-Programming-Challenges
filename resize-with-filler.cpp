@@ -1,7 +1,6 @@
 /*
  * resize-with-filler.cpp
  * Write a program that resizes a 2D array and fills the new space with a user specified value.
- * Then counts by 3s and 5s to 1000 but doesn't display duplicates.
  * by: https://github.com/lduran2
  * time: 2018-06-17 t14:07
  */
