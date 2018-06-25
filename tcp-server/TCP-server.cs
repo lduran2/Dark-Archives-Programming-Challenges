@@ -16,24 +16,23 @@ static class TcpServerTest {
 
 	static void Main(String[] args) {
 		IPAddress ipAddress = new IPAddress(0x0100007f);
-		int portNumber = 80;
+		int portNumber = 8092;
 		int len = 256;
 		Byte[] buff = new Byte[len];
 		Byte[] response = new Byte[len];
-		TcpServer.CallBack callback = new TcpServer.CallBack(TcpServerTest.hToY);
+		TcpServer.CallBack callback = new TcpServer.CallBack(TcpServerTest.toLower);
 
 		TcpServer.Serve(ipAddress, portNumber, buff, len, response, logger, callback);
 	} /* end void Main(String[]) */
 
-	private static int hToY(int eventId, Byte[] buff, int len, Byte[] r) {
+	private static int toLower(int eventId, Byte[] buff, int len, Byte[] r) {
 		String request;
 		String process;
-		Byte[] response;
-		request = Encoding.Unicode.GetString(buff, 0, len);
+		request = Encoding.UTF8.GetString(buff, 0, len);
 		TcpServer.Log(logger, TraceEventType.Information, eventId, "Requested: {0}", request);
-		process = request.Replace("H", "Y").Replace("h", "y");
-		response = Encoding.Unicode.GetBytes(process);
-		return response.Length;
+		process = request.ToLower();
+		Encoding.UTF8.GetBytes(process, 0, process.Length, r, 0);
+		return process.Length;
 	}
 
 }
@@ -56,6 +55,7 @@ namespace DarkArchives {
 					server.Start();
 
 					while (isRequested) {
+						TcpServer.Log(logger, TraceEventType.Verbose, eventId++, "Connecting to {0}:{1}", ipAddress, portNumber);
 						try {
 							using (client = server.AcceptTcpClient()) {
 								TcpServer.Log(logger, TraceEventType.Start, eventId++, "Connected to {0}:{1}", ipAddress, portNumber);
@@ -87,7 +87,7 @@ namespace DarkArchives {
 			int nProcessed;
 			nRead = stream.Read(buff, 0, len);
 			nProcessed = callback(eventId, buff, nRead, response);
-			TcpServer.Log(logger, TraceEventType.Verbose, (eventId + 1), "Responded: {0}", response);
+			TcpServer.Log(logger, TraceEventType.Verbose, (eventId + 1), "Responded: {0}", Encoding.UTF8.GetString(response, 0, nProcessed));
 			stream.Write(response, 0, nProcessed);
 			return (0 != nRead);
 		}
@@ -95,7 +95,7 @@ namespace DarkArchives {
 		public static void Log(TraceSource logger, TraceEventType eventType, int id, String format, params Object[] objects) {
 			String message = String.Format(format, objects);
 			logger.TraceEvent(eventType, id, message);
-			Console.Write("[{0}#{1}] {2}", eventType, id, message);
+			Console.Write("[{0}#{1}] {2}\n", eventType, id, message);
 		} /* end void Log(TraceSource, TraceEventType, int, String, params Object[]) */
 	} /* static class TcpServer */
 
