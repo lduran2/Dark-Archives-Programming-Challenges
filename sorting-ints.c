@@ -30,32 +30,43 @@ char* arrtos
  */
 void aurnfl(size_t len, unsigned int* arr);
 
-void csort(size_t len, unsigned int* els) {
+unsigned int uismax(size_t len, unsigned int* arr)
+{
 	unsigned int max = 0;
-	int* counts;
-
-	/* find the maximum */
-	for (register int i_el = 0; i_el < len; ++i_el) {
-		if (els[i_el] > max)
+	for (register int k = len; k--; ) {
+		if (arr[k] > max)
 		{
-			max = els[i_el];
+			max = arr[k];
 		}
 	}
-	if ((max + 1) == 0)
-	{
-		return;
-	}
-	++max;
+	return max;
+}
 
-	/* make an array with $max elements */
-	counts = (unsigned int*)malloc(max * sizeof(unsigned int));
-	/* fill with 0s */
-	for (register int i_count = 0; i_count < max; ++i_count)
+unsigned int* uisfil(size_t len, unsigned int* arr, int value)
+{
+	for (register int k = len; k--; )
 	{
-		counts[i_count] = 0;
+		arr[k] = value;
 	}
+	return arr;
+}
 
-	// printf("\n%d\n", max);
+void csort(size_t len, unsigned int* els) {
+    /* iteartor on els */
+    unsigned int* it = els;
+	/* the maximum number in @els */
+	const unsigned int max = uismax(len, els);
+	/* the numbers of times each element in @els appears in @els */
+	int* counts;
+	/* halt if the max is one less than unsigned 0 */
+	if ((max + 1) == 0) return;
+
+	/* the maximum represents the final element in @counts */
+	/* therefore, counts */
+	counts = uisfil(max,
+		(unsigned int*)malloc((max + 1) * sizeof(unsigned int)),
+		0
+	);
 
 	/* count each number in the original array */
 	for (register int i_el = 0; i_el < len; ++i_el)
@@ -65,20 +76,13 @@ void csort(size_t len, unsigned int* els) {
 	}
 
 	/* sort the zeros */
-	for (int i_el = 0; i_el < counts[0]; ++i_el)
-	{
-		els[i_el] = 0;
-	}
+	uisfil(counts[0], els, 0);
 
 	/* while accumulating counts */
-	for (register int i_count = 1; i_count < max; ++i_count)
+	for (register int el = 1; el <= max; ++el)
 	{
-		counts[i_count] += counts[i_count - 1];
-		/* sort the elements */
-		for (int i_el = counts[i_count - 1]; i_el < counts[i_count]; ++i_el)
-		{
-			els[i_el] = i_count;
-		}
+	    it += counts[el - 1];
+	    uisfil(counts[el], it, el);
 	}
 }
 
@@ -132,15 +136,12 @@ char* arrtos
 	int printed;
 	/* the current index in @str */
 	int index;
-	/* if array is empty, stop here */
-	if (len <= 0)
-	{
-		return str;
-	} /* end if (len <= 0) */
+	/* halt if array is empty */
+	if (len <= 0) return str;
 
 	/* write first element */
 	printed = format(str, arr, "");
-	/* if an error occurs, stop here */
+	/* halt if an error occurs while printing */
 	if (printed < 0) return str;
 	/* move to end of @str */
 	index += printed;
@@ -153,7 +154,7 @@ char* arrtos
 		ptr += element_size;
 		/* convert pointer before printing */
 		printed = format(str + index, (void**)ptr, separator);
-		/* if an error occurs, stop here */
+		/* halt if an error occurs while printing */
 		if (printed < 0) return str;
 		/* move to end of @str */
 		index += printed;
