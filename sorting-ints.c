@@ -35,12 +35,14 @@ void arndfl(size_t len, int* arr);
  */
 int main(int argc, char** argv)
 {
-    char* str = (char*)malloc(20*4 * sizeof(int));
-    int arr [20];
+	char* str = (char*)malloc(20*4 * sizeof(int));
+	int arr [20];
 
-    arndfl(20, arr);
-    arrtos(str, 20, (void**)arr, sizeof(int), isfmt, ", ");
-    
+	arndfl(20, arr);
+	arrtos(str, 20, (void**)arr, sizeof(int), isfmt, ", ");
+
+	printf(str);
+
 	return 0;
 } /* end &main(int argc, char** argv) */
 
@@ -98,15 +100,14 @@ char* arrtos
 		index += printed;
 	} /* end for (; k < len ;) */
 
-	printf("%s\n", str);
-
 	return str;
-} /* end &arrtos
-     (
-     	char* str, size_t len, void** arr, size_t element_size,
-     	int (*format)(char* str, void** ptr, char* separator),
-     	char* separator
-     )
+} /* end
+		&arrtos
+		(
+			char* str, size_t len, void** arr, size_t element_size,
+			int (*format)(char* str, void** ptr, char* separator),
+			char* separator
+		)
    */
 
 
@@ -120,3 +121,4 @@ void arndfl(size_t len, int* arr)
 		arr[k] = (rand() % len + 1);
 	}
 } /* end &arndfl(size_t len, int* arr) */
+
