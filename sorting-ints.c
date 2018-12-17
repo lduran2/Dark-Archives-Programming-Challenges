@@ -12,7 +12,7 @@
 /**
  * Formats an integer preceded by a separator and writes it to @str.
  */
-int isfmt(char* str, void** ptr, char* separator);
+int uisfmt(char* str, void** ptr, char* separator);
 
 /**
  * Joins an array of the length specified by $len and with elements
@@ -26,22 +26,81 @@ char* arrtos
 );
 
 /**
- * Fills an array with random numbers in [1, $len].
+ * Fills an array with random unsigned integers in [1, $len].
  */
-void arndfl(size_t len, int* arr);
+void aurnfl(size_t len, unsigned int* arr);
+
+void csort(size_t len, unsigned int* els) {
+	unsigned int max = 0;
+	int* counts;
+
+	/* find the maximum */
+	for (register int i_el = 0; i_el < len; ++i_el) {
+		if (els[i_el] > max)
+		{
+			max = els[i_el];
+		}
+	}
+	if ((max + 1) == 0)
+	{
+		return;
+	}
+	++max;
+
+	/* make an array with $max elements */
+	counts = (unsigned int*)malloc(max * sizeof(unsigned int));
+	/* fill with 0s */
+	for (register int i_count = 0; i_count < max; ++i_count)
+	{
+		counts[i_count] = 0;
+	}
+
+	// printf("\n%d\n", max);
+
+	/* count each number in the original array */
+	for (register int i_el = 0; i_el < len; ++i_el)
+	{
+		// printf("\n%d,%d\n", i_el, els[i_el]);
+		++counts[els[i_el]];
+	}
+
+	/* sort the zeros */
+	for (int i_el = 0; i_el < counts[0]; ++i_el)
+	{
+		els[i_el] = 0;
+	}
+
+	/* while accumulating counts */
+	for (register int i_count = 1; i_count < max; ++i_count)
+	{
+		counts[i_count] += counts[i_count - 1];
+		/* sort the elements */
+		for (int i_el = counts[i_count - 1]; i_el < counts[i_count]; ++i_el)
+		{
+			els[i_el] = i_count;
+		}
+	}
+}
 
 /**
  * Main program.
  */
 int main(int argc, char** argv)
 {
-	char* str = (char*)malloc(20*4 * sizeof(int));
-	int arr [20];
+	const size_t LEN = 20;
+	unsigned int arr [20];
+	char* unsorted = (char*)malloc(LEN*5 * sizeof(int));
+	char* sorted = (char*)malloc(LEN*5 * sizeof(int));
 
-	arndfl(20, arr);
-	arrtos(str, 20, (void**)arr, sizeof(int), isfmt, ", ");
+	aurnfl(LEN, arr);
+	arrtos(unsorted, LEN, (void**)arr, sizeof(*arr), uisfmt, ", ");
 
-	printf(str);
+	csort(LEN, arr);
+
+	arrtos(sorted, LEN, (void**)arr, sizeof(*arr), uisfmt, ", ");
+
+	printf("unsort: %s\n", unsorted);
+	printf("sorted: %s\n", sorted);
 
 	return 0;
 } /* end &main(int argc, char** argv) */
@@ -50,10 +109,10 @@ int main(int argc, char** argv)
 /******************************************************************//**
  * Formats an integer preceded by a separator and writes it to @str.
  */
-int isfmt(char* str, void** ptr, char* separator)
+int uisfmt(char* str, void** ptr, char* separator)
 {
-	return sprintf(str, "%s%d", separator, *ptr);
-} /* end &isfmt(char* str, void** ptr, char* separator) */
+	return sprintf(str, "%s%u", separator, *((unsigned int*)ptr));
+} /* end &uisfmt(char* str, void** ptr, char* separator) */
 
 
 /******************************************************************//**
@@ -114,9 +173,9 @@ char* arrtos
 /******************************************************************//**
  * Fills an array with random numbers in [1, $len].
  */
-void arndfl(size_t len, int* arr)
+void aurnfl(size_t len, unsigned int* arr)
 {
-	for (int k = 0; (k < len); ++k)
+	for (register int k = 0; (k < len); ++k)
 	{
 		arr[k] = (rand() % len + 1);
 	}
