@@ -45,11 +45,7 @@ int uisfmt(char* str, void** ptr, char* separator);
  */
 int main(int argc, char** argv)
 {
-	const size_t LEN = 100;
-	unsigned int arr [LEN];
-	char* unsorted = (char*)malloc(LEN*5 * sizeof(int));
-	char* sorted = (char*)malloc(LEN*5 * sizeof(int));
-
+	/* test for correctness */
 	/* 100 random numbers */
 	/* https://www.random.org/integers/?num=100&min=1&max=100&col=100&base=10&format=html&rnd=new */
 	/* Timestamp: 2018-12-17 21:12:49 UTC */
@@ -57,24 +53,23 @@ int main(int argc, char** argv)
 	unsigned int u_correctness [] = { 20, 79, 22, 94, 23, 89, 97, 8, 95, 4, 34, 2, 92, 46, 58, 70, 69, 29, 21, 6, 28, 62, 70, 19, 55, 8, 17, 16, 76, 71, 30, 84, 10, 64, 33, 96, 42, 72, 70, 24, 100, 1, 47, 3, 31, 6, 65, 79, 85, 33, 95, 36, 87, 4, 95, 99, 60, 42, 88, 59, 61, 81, 51, 69, 45, 16, 74, 54, 59, 23, 56, 76, 94, 97, 8, 46, 4, 62, 85, 44, 2, 27, 78, 12, 46, 80, 84, 76, 55, 60, 68, 83, 52, 15, 65, 64, 60, 4, 34, 55 };
 	unsigned int s_correctness [] = { 1, 2, 2, 3, 4, 4, 4, 4, 6, 6, 8, 8, 8, 10, 12, 15, 16, 16, 17, 19, 20, 21, 22, 23, 23, 24, 27, 28, 29, 30, 31, 33, 33, 34, 34, 36, 42, 42, 44, 45, 46, 46, 46, 47, 51, 52, 54, 55, 55, 55, 56, 58, 59, 59, 60, 60, 60, 61, 62, 62, 64, 64, 65, 65, 68, 69, 69, 70, 70, 70, 71, 72, 74, 76, 76, 76, 78, 79, 79, 80, 81, 83, 84, 84, 85, 85, 87, 88, 89, 92, 94, 94, 95, 95, 95, 96, 97, 97, 99, 100 };
 
-	aurnfl(LEN, arr);
-	arrtos(unsorted, LEN, (void**)arr, sizeof(*arr), uisfmt, ", ");
+	/* for sorting random numbers */
+	const size_t LEN = 100;
+	unsigned int arr [LEN];
+	char* unsorted = (char*)malloc(LEN*5 * sizeof(int));
+	char* sorted = (char*)malloc(LEN*5 * sizeof(int));
 
+	/* sorts the two arrays */
+	csort(N_CORRECTNESS, u_correctness);
 	csort(LEN, arr);
 
+	/* creates the string representation of @arr */
+	aurnfl(LEN, arr);
+	arrtos(unsorted, LEN, (void**)arr, sizeof(*arr), uisfmt, ", ");
 	arrtos(sorted, LEN, (void**)arr, sizeof(*arr), uisfmt, ", ");
 
-	csort(N_CORRECTNESS, u_correctness);
-
-	// char* su_correctness = (char*)malloc(N_CORRECTNESS*5 * sizeof(int));
-	// char* ss_correctness = (char*)malloc(N_CORRECTNESS*5 * sizeof(int));
-	// arrtos(su_correctness, N_CORRECTNESS, (void**)u_correctness, sizeof(*arr), uisfmt, ", ");
-	// arrtos(ss_correctness, N_CORRECTNESS, (void**)s_correctness, sizeof(*arr), uisfmt, ", ");
-	// printf("unsort: %s\n", su_correctness);
-	// printf("sorted: %s\n", ss_correctness);
-
+	/* print the results */
 	printf("csort is correct: %d\n", uisequ(N_CORRECTNESS, u_correctness, s_correctness));
-
 	printf("unsort: %s\n", unsorted);
 	printf("sorted: %s\n", sorted);
 
