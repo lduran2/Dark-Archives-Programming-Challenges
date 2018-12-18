@@ -3,16 +3,26 @@
  * Sorts an array of 100 random integers.
  * by: Leomar Durán <https://github.com/lduran2>
  * for: https://github.com/lduran2/Dark-Archives-Programming-Challenges/blob/master/sorting-ints.cpp
- * time: 2018-12-17 t13:57
+ * time: 2018-12-17 t20:37
  */
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
 
 /**
- * Formats an integer preceded by a separator and writes it to @str.
+ * Sorts an array of unsigned integers using the count search.
  */
-int uisfmt(char* str, void** ptr, char* separator);
+void csort(size_t len, unsigned int* els);
+
+/**
+ * Fills an array with random unsigned integers in [1, $len].
+ */
+void aurnfl(size_t len, unsigned int* arr);
+
+/**
+ * Compares two arrays of unsigned integers for equality.
+ */
+int uisequ(size_t len, unsigned int* a, unsigned int* b);
 
 /**
  * Joins an array of the length specified by $len and with elements
@@ -26,17 +36,9 @@ char* arrtos
 );
 
 /**
- * Fills an array with random unsigned integers in [1, $len].
+ * Formats an integer preceded by a separator and writes it to @str.
  */
-void aurnfl(size_t len, unsigned int* arr);
-
-int uisequ(size_t len, unsigned int* a, unsigned int* b);
-
-unsigned int uismax(size_t len, unsigned int* arr);
-
-unsigned int* uisfil(size_t len, unsigned int* arr, int value);
-
-void csort(size_t len, unsigned int* els);
+int uisfmt(char* str, void** ptr, char* separator);
 
 /**
  * Main program.
@@ -81,12 +83,100 @@ int main(int argc, char** argv)
 
 
 /******************************************************************//**
- * Formats an integer preceded by a separator and writes it to @str.
+ * Sorts an array of unsigned integers using the count search.
  */
-int uisfmt(char* str, void** ptr, char* separator)
+void csort(size_t len, unsigned int* els) {
+	/* dependencies */
+	unsigned int uismax(size_t len, unsigned int* arr);
+	unsigned int* uisfil(size_t len, unsigned int* arr, int value);
+
+	/* iteartor on els */
+	unsigned int* it = els;
+	/* the maximum number in @els */
+	const unsigned int MAX = uismax(len, els);
+	/* the numbers of times each element in @els appears in @els */
+	int* counts;
+	/* the number of unique elements being counted in els */
+	const int N_COUNTS = (MAX + 1);
+	/* overflow check : halt if the max is one less than unsigned 0 */
+	if (N_COUNTS == 0) return;
+
+	/* the maximum represents the final element in @counts */
+	/* therefore, counts */
+	counts = uisfil(N_COUNTS, (unsigned int*)malloc(N_COUNTS*sizeof(int)), 0);
+
+	/* count each number in the original array */
+	for (register int i_el = len; i_el--; )
+	{
+		++counts[els[i_el]];
+	} /* end for (; i_el--; ) */
+
+	/* sort the zeros */
+	uisfil(counts[0], els, 0);
+
+	/* while accumulating counts */
+	for (int el = 1; el <= MAX; ++el)
+	{
+		it += counts[el - 1];
+		uisfil(counts[el], it, el);
+	} /* end for (; el <= MAX; ) */
+} /* end &csort(size_t len, unsigned int* els) */
+
+
+/******************************************************************//**
+ * Find the maximum number in an array of integers.
+ */
+unsigned int uismax(size_t len, unsigned int* arr)
 {
-	return sprintf(str, "%s%u", separator, *((unsigned int*)ptr));
-} /* end &uisfmt(char* str, void** ptr, char* separator) */
+	unsigned int max = 0;
+	for (register int k = len; k--; )
+	{
+		if (arr[k] > max)
+		{
+			max = arr[k];
+		} /* end if (arr[k] > max) */
+	} /* end for (; k--; ) */
+	return max;
+} /* end &uismax(size_t len, unsigned int* arr) */
+
+
+/******************************************************************//**
+ * Fills an array of random unsigned with a specified value.
+ */
+unsigned int* uisfil(size_t len, unsigned int* arr, int value)
+{
+	for (register int k = len; k--; )
+	{
+		arr[k] = value;
+	} /* end for (; k--; ) */
+	return arr;
+} /* end &uisfil(size_t len, unsigned int* arr, int value) */
+
+
+/******************************************************************//**
+ * Fills an array with random numbers in [1, $len].
+ */
+void aurnfl(size_t len, unsigned int* arr)
+{
+	for (register int k = 0; (k < len); ++k)
+	{
+		arr[k] = (rand() % len + 1);
+	}
+} /* end &arndfl(size_t len, int* arr) */
+
+
+/******************************************************************//**
+ * Compares two arrays of unsigned integers for equality.
+ */
+int uisequ(size_t len, unsigned int* a, unsigned int* b)
+{
+	int are_equal = 1;
+	for (int k = len; (k-- && are_equal); a++, b++)
+	{
+		are_equal = (*a == *b);
+	} /* end for (; (k-- && are_equal); ) */
+	return are_equal;
+} /* end &uisequ(size_t len, unsigned int* a, unsigned int* b) */
 
 
 /******************************************************************//**
@@ -142,83 +232,9 @@ char* arrtos
 
 
 /******************************************************************//**
- * Fills an array with random numbers in [1, $len].
+ * Formats an integer preceded by a separator and writes it to @str.
  */
-void aurnfl(size_t len, unsigned int* arr)
+int uisfmt(char* str, void** ptr, char* separator)
 {
-	for (register int k = 0; (k < len); ++k)
-	{
-		arr[k] = (rand() % len + 1);
-	}
-} /* end &arndfl(size_t len, int* arr) */
-
-int uisequ(size_t len, unsigned int* a, unsigned int* b)
-{
-	int are_equal = 1;
-	for (int k = len; k-- && are_equal; a++, b++)
-	{
-		are_equal = (*a == *b);
-	}
-	return are_equal;
-}
-
-unsigned int uismax(size_t len, unsigned int* arr)
-{
-	unsigned int max = 0;
-	for (register int k = len; k--; ) {
-		if (arr[k] > max)
-		{
-			max = arr[k];
-		}
-	}
-	return max;
-}
-
-unsigned int* uisfil(size_t len, unsigned int* arr, int value)
-{
-	for (register int k = len; k--; )
-	{
-		arr[k] = value;
-	}
-	return arr;
-}
-
-void csort(size_t len, unsigned int* els) {
-	/* dependencies */
-	unsigned int uismax(size_t len, unsigned int* arr);
-	unsigned int* uisfil(size_t len, unsigned int* arr, int value);
-
-    /* iteartor on els */
-    unsigned int* it = els;
-	/* the maximum number in @els */
-	const unsigned int max = uismax(len, els);
-	/* the numbers of times each element in @els appears in @els */
-	int* counts;
-	/* halt if the max is one less than unsigned 0 */
-	if ((max + 1) == 0) return;
-
-	/* the maximum represents the final element in @counts */
-	/* therefore, counts */
-	counts = uisfil(max,
-		(unsigned int*)malloc((max + 1) * sizeof(unsigned int)),
-		0
-	);
-
-	/* count each number in the original array */
-	for (register int i_el = 0; i_el < len; ++i_el)
-	{
-		// printf("\n%d,%d\n", i_el, els[i_el]);
-		++counts[els[i_el]];
-	}
-
-	/* sort the zeros */
-	uisfil(counts[0], els, 0);
-
-	/* while accumulating counts */
-	for (register int el = 1; el <= max; ++el)
-	{
-	    it += counts[el - 1];
-	    uisfil(counts[el], it, el);
-	}
-}
-
+	return sprintf(str, "%s%u", separator, *((unsigned int*)ptr));
+} /* end &uisfmt(char* str, void** ptr, char* separator) */
