@@ -29,7 +29,7 @@ int uisequ(size_t len, unsigned int* a, unsigned int* b);
  * of the size specified by $element_size as a string written to @str,
  * using the specified formating function and with the given separator.
  */
-char* arrtos
+int arrtos
 (
 	char* str, size_t len, void** arr, size_t element_size,
 	int (*format)(char* str, void** ptr, char* separator), char* separator
@@ -56,15 +56,17 @@ int main(int argc, char** argv)
 	/* for sorting random numbers */
 	const size_t LEN = 100;
 	unsigned int arr [LEN];
-	char* unsorted = (char*)malloc(LEN*5 * sizeof(int));
-	char* sorted = (char*)malloc(LEN*5 * sizeof(int));
+	char* unsorted = (char*)malloc(LEN*5 * sizeof(char));
+	char* sorted = (char*)malloc(LEN*5 * sizeof(char));
+
+	/* fill arr with random numbers */
+	aurnfl(LEN, arr);
 
 	/* sorts the two arrays */
 	csort(N_CORRECTNESS, u_correctness);
 	csort(LEN, arr);
 
 	/* creates the string representation of @arr */
-	aurnfl(LEN, arr);
 	arrtos(unsorted, LEN, (void**)arr, sizeof(*arr), uisfmt, ", ");
 	arrtos(sorted, LEN, (void**)arr, sizeof(*arr), uisfmt, ", ");
 
@@ -90,9 +92,9 @@ void csort(size_t len, unsigned int* els) {
 	/* the maximum number in @els */
 	const unsigned int MAX = uismax(len, els);
 	/* the numbers of times each element in @els appears in @els */
-	int* counts;
+	size_t* counts;
 	/* the number of unique elements being counted in els */
-	const int N_COUNTS = (MAX + 1);
+	const size_t N_COUNTS = (MAX + 1);
 	/* overflow check : halt if the max is one less than unsigned 0 */
 	if (N_COUNTS == 0) return;
 
@@ -110,7 +112,7 @@ void csort(size_t len, unsigned int* els) {
 	uisfil(counts[0], els, 0);
 
 	/* while accumulating counts */
-	for (int el = 1; el <= MAX; ++el)
+	for (int el = 1; el < N_COUNTS; ++el)
 	{
 		it += counts[el - 1];
 		uisfil(counts[el], it, el);
@@ -179,7 +181,7 @@ int uisequ(size_t len, unsigned int* a, unsigned int* b)
  * of the size specified by $element_size as a string written to @str,
  * using the specified formating function and with the given separator.
  */
-char* arrtos
+int arrtos
 (
 	char* str, size_t len, void** arr, size_t element_size,
 	int (*format)(char* str, void** ptr, char* separator), char* separator
@@ -192,12 +194,12 @@ char* arrtos
 	/* the current index in @str */
 	int index;
 	/* halt if array is empty */
-	if (len <= 0) return str;
+	if (len <= 0) return 0;
 
 	/* write first element */
-	printed = format(str, arr, "");
+	printed = format(str, arr, "") - 1;
 	/* halt if an error occurs while printing */
-	if (printed < 0) return str;
+	if (printed < 0) return printed;
 	/* move to end of @str */
 	index += printed;
 
@@ -210,12 +212,12 @@ char* arrtos
 		/* convert pointer before printing */
 		printed = format(str + index, (void**)ptr, separator);
 		/* halt if an error occurs while printing */
-		if (printed < 0) return str;
+		if (printed < 0) return printed;
 		/* move to end of @str */
 		index += printed;
 	} /* end for (; k < len ;) */
 
-	return str;
+	return index;
 } /* end
 		&arrtos
 		(
@@ -231,5 +233,7 @@ char* arrtos
  */
 int uisfmt(char* str, void** ptr, char* separator)
 {
-	return sprintf(str, "%s%u", separator, *((unsigned int*)ptr));
+	int printed = sprintf(str, "%s%u", separator, *((unsigned int*)ptr));
+	printf("\n%s\n", str);
+	return printed;
 } /* end &uisfmt(char* str, void** ptr, char* separator) */
