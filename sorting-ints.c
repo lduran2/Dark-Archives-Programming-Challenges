@@ -12,7 +12,7 @@
 /**
  * Sorts an array of unsigned integers using the count search.
  */
-void csort(size_t len, unsigned int* els);
+void csort(const size_t len, unsigned int* els);
 
 /**
  * Fills an array with random unsigned integers in [1, $len].
@@ -82,12 +82,12 @@ int main(int argc, char** argv)
 /******************************************************************//**
  * Sorts an array of unsigned integers using the count search.
  */
-void csort(size_t len, unsigned int* els) {
+void csort(const size_t len, unsigned int* els) {
 	/* dependencies */
 	unsigned int uismax(size_t len, unsigned int* arr);
-	unsigned int* uisfil(size_t len, unsigned int* arr, int value);
+	unsigned int* uisfil(size_t len, unsigned int* arr, unsigned int value);
 
-	/* iteartor on els */
+	/* iterator on els */
 	unsigned int* it = els;
 	/* the maximum number in @els */
 	const unsigned int MAX = uismax(len, els);
@@ -99,7 +99,6 @@ void csort(size_t len, unsigned int* els) {
 	if (N_COUNTS == 0) return;
 
 	/* the maximum represents the final element in @counts */
-	/* therefore, counts */
 	counts = uisfil(N_COUNTS, (unsigned int*)malloc(N_COUNTS*sizeof(int)), 0);
 
 	/* count each number in the original array */
@@ -112,11 +111,11 @@ void csort(size_t len, unsigned int* els) {
 	uisfil(counts[0], els, 0);
 
 	/* while accumulating counts */
-	for (int el = 1; el < N_COUNTS; ++el)
+	for (int el = 1; (el < N_COUNTS); ++el)
 	{
 		it += counts[el - 1];
 		uisfil(counts[el], it, el);
-	} /* end for (; el <= MAX; ) */
+	} /* end for (; (el < N_COUNTS); ) */
 } /* end &csort(size_t len, unsigned int* els) */
 
 
@@ -138,9 +137,9 @@ unsigned int uismax(size_t len, unsigned int* arr)
 
 
 /******************************************************************//**
- * Fills an array of random unsigned with a specified value.
+ * Fills an array of unsigned integers with a specified value.
  */
-unsigned int* uisfil(size_t len, unsigned int* arr, int value)
+unsigned int* uisfil(size_t len, unsigned int* arr, unsigned int value)
 {
 	for (register int k = len; k--; )
 	{
