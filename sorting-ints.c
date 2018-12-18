@@ -64,16 +64,16 @@ int main(int argc, char** argv)
 
 	/* sorts the two arrays */
 	csort(N_CORRECTNESS, u_correctness);
-	csort(LEN, arr);
 
 	/* creates the string representation of @arr */
 	arrtos(unsorted, LEN, (void**)arr, sizeof(*arr), uisfmt, ", ");
+	csort(LEN, arr);
 	arrtos(sorted, LEN, (void**)arr, sizeof(*arr), uisfmt, ", ");
 
 	/* print the results */
 	printf("csort is correct: %d\n", uisequ(N_CORRECTNESS, u_correctness, s_correctness));
-	printf("unsort: %s\n", unsorted);
-	printf("sorted: %s\n", sorted);
+	printf("unsort: %s\n", unsorted);//, unsorted[1], unsorted[2], unsorted[3]);
+	printf("sorted: %s\n", sorted);//, sorted[1], sorted[2], sorted[3]);
 
 	return 0;
 } /* end &main(int argc, char** argv) */
@@ -192,12 +192,13 @@ int arrtos
 	/* number of characters printed by each call to &format */
 	int printed;
 	/* the current index in @str */
-	int index;
+	/* NOTE: the current element is printed at @str + $index, start at 0 */
+	int index = 0;
 	/* halt if array is empty */
 	if (len <= 0) return 0;
 
 	/* write first element */
-	printed = format(str, arr, "") - 1;
+	printed = format(str, arr, "");
 	/* halt if an error occurs while printing */
 	if (printed < 0) return printed;
 	/* move to end of @str */
@@ -234,6 +235,5 @@ int arrtos
 int uisfmt(char* str, void** ptr, char* separator)
 {
 	int printed = sprintf(str, "%s%u", separator, *((unsigned int*)ptr));
-	printf("\n%s\n", str);
 	return printed;
 } /* end &uisfmt(char* str, void** ptr, char* separator) */
