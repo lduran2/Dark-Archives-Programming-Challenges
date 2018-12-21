@@ -10,26 +10,37 @@ namespace io
 			{
 				public static class BenchmarkCountSort
 				{
-					public const int LOOP = 10_000;
-					public const int WARMUP = 15;
-					public const int REPEAT = 10;
-					public const long TIME = 25_955; // moderate 10s of seconds
+					public const int N_LOOPS = 10000;
+					public const int N_WARMUPS = 15;
+					public const int N_REPEATS = 10;
+					public const long TIME = 25955; // moderate 10s of seconds
 
 					public static void Main(string[] args)
 					{
+						args = new string[1]{"100"};
 						// Stopwatch sw = Stopwatch.StartNew();
+						long[] warmup_time = new long[N_WARMUPS];
+						long[] repeat_time = new long[N_REPEATS];
 						int array_size;
-						long[] warmup_time = new long[WARMUP];
-						long[] repeat_time = new long[REPEAT];
-						if (Int32.TryParse(args[0], out array_size)) {
+						if (!Int32.TryParse(args[0], out array_size))
+						{
 							return;
 						}
-						GC.Collect();
-						for (int k = WARMUP; (k-- > 0); ) {
-							
-							for (int l = LOOP; (l-- > LOOP); ) {
-								
+						for (int i_round = N_WARMUPS; (i_round-- > 0); )
+						{
+							int[] array;
+							int[] counts;
+							Random randoms;
+							GC.Collect();
+							randoms = new Random();
+							array = new int[array_size];
+							counts = new int[array_size + 1];
+							for (int i_loop = N_LOOPS; (i_loop-- > 0); )
+							{
+								FillRandom(array_size, array, randoms);
+								CountSort(array_size, array, array_size, counts);
 							}
+							Console.WriteLine(String.Join(", ", array));
 						}
 					}
 
@@ -48,22 +59,34 @@ namespace io
 						} /* end for (; (i_el-- > 0); ) */
 
 						/* sort the zeros */
-						fill(0, counts[0], els, 0);
+						Fill(0, counts[0], els, 0);
 
 						/* while accumulating counts */
 						for (int el = 1; (el < n_counts); ++el)
 						{
-							fill(counts[el - 1], counts[el], els, el);
+							Fill(counts[el - 1], counts[el], els, el);
 						} /* end for (; (el < n_counts); ) */
 					} /* end &CountSort(int len, int[] els, int max, int[] counts) */
 
 
 					/******************************************************************//**
-					 * Fills an array of integers with a specified value.
+					 * Fills an array with random numbers in [1, $len].
 					 */
-					public static void fill(int off, int len, int[] arr, int value)
+					public static void FillRandom(int len, int[] arr, Random randoms)
 					{
 						for (int k = len; (k-- > 0); )
+						{
+							arr[k] = randoms.Next(1, len);
+						}
+					} /* end &arndfl(size_t len, int* arr) */
+
+
+					/******************************************************************//**
+					 * Fills an array of integers with a specified value.
+					 */
+					public static void Fill(int off, int len, int[] arr, int value)
+					{
+						for (int k = len; (k-- > off); )
 						{
 							arr[k] = value;
 						} /* end for (; (k-- > 0); ) */
@@ -73,7 +96,7 @@ namespace io
 					// /******************************************************************//**
 					 // * Find the maximum number in an array of integers.
 					 // */
-					// public static int max(int len, int[] arr)
+					// public static int Max(int len, int[] arr)
 					// {
 						// int max = Int32.MinValue;
 						// for (int k = len; (k-- > 0); )
