@@ -154,7 +154,7 @@ unsigned int* uisfil(size_t len, unsigned int* arr, unsigned int value)
  */
 void aurnfl(size_t len, unsigned int* arr)
 {
-	for (register int k = 0; (k < len); ++k)
+	for (register int k = len; k--; )
 	{
 		arr[k] = (rand() % len + 1);
 	}
