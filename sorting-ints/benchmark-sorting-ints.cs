@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 
 namespace io
 {
@@ -30,27 +31,30 @@ namespace io
 						{
 							int[] array;
 							int[] counts;
+							int n_counts = (array_size + 1);
 							Random randoms;
 							GC.Collect();
 							randoms = new Random();
 							array = new int[array_size];
-							counts = new int[array_size + 1];
+							counts = new int[n_counts];
 							for (int i_loop = N_LOOPS; (i_loop-- > 0); )
 							{
 								FillRandom(array_size, array, randoms);
-								CountSort(array_size, array, array_size, counts);
+								Fill(0, n_counts, counts, 0);
+								CountSort(array_size, array, n_counts, counts);
 							}
-							Console.WriteLine(String.Join(", ", array));
+							Console.Error.Write("[");
+							Console.Error.Write(String.Join(", ", array));
+							Console.Error.Write("]");
+							Console.Error.WriteLine();
 						}
 					}
 
 					/******************************************************************//**
 					 * Sorts an array of unsigned integers using the count search.
 					 */
-					public static void CountSort(int len, int[] els, int max, int[] counts) {
-						/* iterator on els */
+					public static void CountSort(int len, int[] els, int n_counts, int[] counts) {
 						/* the number of unique elements being counted in els */
-						int n_counts = (max + 1);
 
 						/* count each number in the original array */
 						for (int i_el = len; (i_el-- > 0); )
@@ -64,9 +68,10 @@ namespace io
 						/* while accumulating counts */
 						for (int el = 1; (el < n_counts); ++el)
 						{
+							counts[el] += counts[el - 1];
 							Fill(counts[el - 1], counts[el], els, el);
 						} /* end for (; (el < n_counts); ) */
-					} /* end &CountSort(int len, int[] els, int max, int[] counts) */
+					} /* end &CountSort(int len, int[] els, int n_counts, int[] counts) */
 
 
 					/******************************************************************//**
