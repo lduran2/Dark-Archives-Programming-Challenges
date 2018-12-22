@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 
 namespace io
 {
@@ -11,42 +10,62 @@ namespace io
 			{
 				public static class BenchmarkCountSort
 				{
-					public const int N_LOOPS = 10000;
-					public const int N_WARMUPS = 15;
-					public const int N_REPEATS = 10;
-					public const long TIME = 25955; // moderate 10s of seconds
+					public const int N_LOOPS = 10_000;
+					public static readonly int[] N_TRIALS = {15, 10};
+					public const int N_TRIAL_TYPES = 2;
+					public static readonly int N_WARMUPS = N_TRIALS[0];
+					public static readonly int N_REPEATS = N_TRIALS[1];
+					public const long TIME = 25_955; // moderate 10s of seconds
 
 					public static void Main(string[] args)
 					{
-						args = new string[1]{"100"};
-						// Stopwatch sw = Stopwatch.StartNew();
-						long[] warmup_time = new long[N_WARMUPS];
-						long[] repeat_time = new long[N_REPEATS];
+						if (args.Length == 0) args = new string[1]{"100"};
+						double[,] timings = new double[N_WARMUPS,N_LOOPS];
 						int array_size;
 						if (!Int32.TryParse(args[0], out array_size))
 						{
 							return;
 						}
-						for (int i_round = N_WARMUPS; (i_round-- > 0); )
+						for (int i_trial_type = 0; (i_trial_type < N_TRIAL_TYPES); i_trial_type++)
 						{
-							int[] array;
-							int[] counts;
-							int n_counts = (array_size + 1);
-							Random randoms;
-							GC.Collect();
-							randoms = new Random();
-							array = new int[array_size];
-							counts = new int[n_counts];
+							for (int i_round = N_TRIALS[i_trial_type]; (i_round-- > 0); )
+							{
+								long start;
+								long finish;
+								int[] array;
+								int[] counts;
+								int n_counts = (array_size + 1);
+								Random randoms;
+
+								GC.Collect();
+								randoms = new Random();
+								array = new int[array_size];
+								counts = new int[n_counts];
+
+								for (int i_loop = N_LOOPS; (i_loop-- > 0); )
+								{
+									FillRandom(array_size, array, randoms);
+									start = Stopwatch.GetTimestamp();
+									Fill(0, n_counts, counts, 0);
+									CountSort(array_size, array, n_counts, counts);
+									finish = Stopwatch.GetTimestamp();
+									timings[i_round, i_loop] = (((double)finish) - ((double)start));
+								}
+
+								Console.Error.Write("{0} ", array[array_size-1]);
+							}
+						}
+						Console.Error.WriteLine();
+						for (int i_round = N_REPEATS; (i_round-- > 0); )
+						{
+							double mean;
+							double time_sum = 0;
 							for (int i_loop = N_LOOPS; (i_loop-- > 0); )
 							{
-								FillRandom(array_size, array, randoms);
-								Fill(0, n_counts, counts, 0);
-								CountSort(array_size, array, n_counts, counts);
+								time_sum += timings[i_round, i_loop];
 							}
-							Console.Error.Write("[");
-							Console.Error.Write(String.Join(", ", array));
-							Console.Error.Write("]");
-							Console.Error.WriteLine();
+							mean = ((((time_sum / N_LOOPS) * 1.0e+6)) / Stopwatch.Frequency);
+							Console.WriteLine(mean);
 						}
 					}
 
