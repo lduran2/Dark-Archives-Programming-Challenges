@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 
 namespace io
 {
@@ -19,9 +20,10 @@ namespace io
 
 					public static void Main(string[] args)
 					{
-						if (args.Length == 0) args = new string[1]{"100"};
-						double[,] timings = new double[N_WARMUPS,N_LOOPS];
+						long[,] timings;
 						int array_size;
+						if (args.Length == 0) args = new string[1]{"100"};
+						timings = new long[N_WARMUPS,N_LOOPS];
 						if (!Int32.TryParse(args[0], out array_size))
 						{
 							return;
@@ -49,7 +51,7 @@ namespace io
 									Fill(0, n_counts, counts, 0);
 									CountSort(array_size, array, n_counts, counts);
 									finish = Stopwatch.GetTimestamp();
-									timings[i_round, i_loop] = (((double)finish) - ((double)start));
+									timings[i_round, i_loop] = (finish - start);
 								}
 
 								Console.Error.Write("{0} ", array[array_size-1]);
@@ -60,12 +62,31 @@ namespace io
 						{
 							double mean;
 							double time_sum = 0;
+							double min;
+							double max;
+							long min_ticks = Int64.MaxValue;
+							long max_ticks = Int64.MinValue;
 							for (int i_loop = N_LOOPS; (i_loop-- > 0); )
 							{
-								time_sum += timings[i_round, i_loop];
+								time_sum += ((double)timings[i_round, i_loop]);
+								if (timings[i_round, i_loop] < min_ticks)
+								{
+									// Console.WriteLine(">>[min]> {0}>{1}", min_ticks, timings[i_round, i_loop]);
+									min_ticks = timings[i_round, i_loop];
+								}
+								if (timings[i_round, i_loop] > max_ticks)
+								{
+									// Console.WriteLine(">>[max]> {0}<{1}", max_ticks, timings[i_round, i_loop]);
+									max_ticks = timings[i_round, i_loop];
+								}
 							}
 							mean = ((((time_sum / N_LOOPS) * 1.0e+6)) / Stopwatch.Frequency);
-							Console.WriteLine(mean);
+							min = ((min_ticks * 1.0e+6) / Stopwatch.Frequency);
+							max = ((max_ticks * 1.0e+6) / Stopwatch.Frequency);
+							Console.WriteLine("min : {0}", min);
+							Console.WriteLine("mean: {0}", mean);
+							Console.WriteLine("max : {0}", max);
+							Console.WriteLine();
 						}
 					}
 
