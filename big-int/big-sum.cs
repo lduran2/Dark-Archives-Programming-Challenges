@@ -3,7 +3,8 @@
  * Adds two integers of arbitrary length and base.
  * by: Leomar Durán <https://github.com/lduran2>
  * for: https://github.com/lduran2/Dark-Archives-Programming-Challenges/
- * time: 2018-12-24 t22:26
+ * started: 2018-12-24 t12:46
+ * time:    2018-12-26 t23:39
  */
 using System;
 
@@ -51,8 +52,7 @@ namespace io.github.lduran2.math
 			Console.WriteLine("= {0}", BigSum.toString(n_result_bytes, result_bytes));
 			Console.WriteLine();
 
-			(n_m_bytes, m_bytes) = (4, new Byte[]{0x12, 0x34, 0x56, 0xFF});
-			(n_p_bytes, p_bytes) = (3, new Byte[]{0xEE, 0xCB, 0xA9});
+			++p_bytes[0];
 			(n_result_bytes, result_bytes) = BigSum.Add((n_m_bytes, m_bytes), (n_p_bytes, p_bytes));
 			Console.WriteLine("  {0}", BigSum.toString(n_m_bytes, m_bytes));
 			Console.WriteLine("+ {0}", BigSum.toString(n_p_bytes, p_bytes));
@@ -60,9 +60,24 @@ namespace io.github.lduran2.math
 			Console.WriteLine();
 
 			/* Reminder: The byte array is little-endian. */
-			Console.WriteLine("{0}", BigSum.toString(3, new byte[]{0x87, 0xD6, 0x12}));
-			Console.WriteLine("{0}", BigSum.ToString((3, new byte[]{0x87, 0xD6, 0x12}), Numeration(10)));
-			Console.WriteLine("{0}", BigSum.ToString((3, new byte[]{0x87, 0xD6, 0x12}), Numeration(16)));
+			Console.WriteLine("{0}", BigSum.toString (3, new byte[]{0x87, 0xD6, 0x12}));
+			Console.WriteLine("{0}", BigSum.ToString((3, new byte[]{0x87, 0xD6, 0x12}), BigSum.Numeration(10)));
+			Console.WriteLine("{0}", BigSum.ToString((3, new byte[]{0x87, 0xD6, 0x12}), BigSum.Numeration(16)));
+			Console.WriteLine();
+
+			Console.WriteLine("{0}", BigSum.ToString((4, new byte[]{0x00, 0x00, 0x00, 0x10}), BigSum.Numeration(16)));
+			Console.WriteLine();
+
+			Console.WriteLine("{0}", BigSum.toString (3, new byte[]{69, 117, 24}));
+			Console.WriteLine("{0}", BigSum.ToString((3, new byte[]{69, 117, 24}), BigSum.Numeration(17)));
+			Console.WriteLine();
+
+			Console.WriteLine("{0}", BigSum.ToString((1, new byte[]{1}), BigSum.Numeration(2)));
+			Console.WriteLine("{0}", BigSum.ToString((1, new byte[]{0}), BigSum.Numeration(2)));
+			Console.WriteLine("{0}", BigSum.ToString((0, new byte[]{ }), BigSum.Numeration(2)));
+			Console.WriteLine();
+
+			Console.WriteLine("{0}", BigSum.Add("0", BigSum.Numeration(2), "0", BigSum.Numeration(2), BigSum.Numeration(2)));
 		}
 
 		private static string toString(int n_bytes, byte[] bytes)
@@ -99,8 +114,10 @@ namespace io.github.lduran2.math
 
 		public static (int, byte[]) Parse(string n, (int radix, string digits) numeration)
 		{
-			return (0, new byte[0]);
+			return (1, new byte[]{0});
 		}
+
+		// public static {}
 
 		public static (int len, byte[] bytes)
 			Add((int len, byte[] bytes) n, (int len, byte[] bytes) m)
@@ -135,7 +152,7 @@ namespace io.github.lduran2.math
 			if (BigSum.BYTES_RADIX <= sum)
 			{
 				sum -= BigSum.BYTES_RADIX;
-				new_carry += 1;
+				++new_carry;
 			}
 			(result, carry) = (((byte)sum), new_carry);
 		}
@@ -173,13 +190,18 @@ namespace io.github.lduran2.math
 			chars_len = (((int)(len * Math.Log(BigSum.BYTES_RADIX, radix))) + 1);
 			chars = new char[chars_len];
 			i_char = (chars_len - 1);
+			// Console.Error.WriteLine(chars_len);
 
-			while (len > 0)
+			while (true)
 			{
 				int remainder;
 				for (int k = len; ((k-- > 0) && (0 == bytes[k])); )
 				{
 					--len;
+				}
+				if (len <= 0)
+				{
+					break;
 				}
 				/*
 				 *	Example:
@@ -199,7 +221,7 @@ namespace io.github.lduran2.math
 				 *	=  0,   0,   0 R 1
 				 *	-----------------------------------
 				 *	  18, 214, 135[256] = 1,234,567[10]
-				 *-------------------------------------
+				 *-----------------------------------------
 				 *	  1 R 8 =                        18 /10
 				 *	        = ((((   0 % 10)*256) +  18)/10)
 				 *	226 R 2 = ((((  18 % 10)*256) + 214)/10)
@@ -214,11 +236,26 @@ namespace io.github.lduran2.math
 					remainder = (dividend - (quotient * radix));
 					bytes[k] = ((byte)quotient);
 				}
+				// Console.Error.WriteLine("{0} {1} {2}", new String(chars, (i_char + 1), (chars_len - 1 - i_char)), remainder, len);
 				chars[i_char] = digits[remainder];
 				--i_char;
 			}
-			while (digits[0] == chars[++i_char])
-			{}
+			while (i_char < 0)
+			{
+				++i_char;
+			}
+			while (true)
+			{
+				if (chars_len <= i_char)
+				{
+					return digits.Substring(0, 1);
+				}
+				else if (0 != chars[i_char])
+				{
+					break;
+				}
+				++i_char;
+			}
 
 			return new String(chars, i_char, (chars_len - i_char));
 		}
