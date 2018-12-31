@@ -31,6 +31,7 @@ namespace io.github.lduran2.math
 			int radix1 = Int32.Parse(argv[3]);
 			int result_radix = Int32.Parse(argv[4]);
 			Console.WriteLine("{0}", BigSum.Add(num0, BigSum.Numeration(radix0), num1, BigSum.Numeration(radix1), BigSum.Numeration(result_radix)));
+			Console.WriteLine("{0}", BigSum.Subtract(num1, BigSum.Numeration(radix1), num0, BigSum.Numeration(radix0), BigSum.Numeration(result_radix)));
 		}
 
 		private static void debug(String[] argv)
@@ -131,6 +132,24 @@ namespace io.github.lduran2.math
 			);
 		}
 
+		public static string Subtract
+		(
+			string n, (int radix, string digits) n_numeration,
+			string m, (int radix, string digits) m_numeration,
+				(int radix, string digits) result_numeration
+		)
+		{
+			return BigSum.ToString
+			(
+				BigSum.Subtract
+				(
+					BigSum.Parse(n, n_numeration),
+					BigSum.Parse(m, m_numeration)
+				),
+				result_numeration
+			);
+		}
+
 		public static (int, byte[]) Parse(string converthand, (int radix, string digits) numeration)
 		{
 			int radix;
@@ -139,7 +158,6 @@ namespace io.github.lduran2.math
 			int rem_mask = (int)(BYTES_RADIX - 1);
 
 			int n_bytes = (((int)(len * Math.Log(17, 256))) + 1);
-			// Console.WriteLine(n_bytes);
 			int i_byte = 0;
 			byte[] bytes = new byte[n_bytes];
 
@@ -168,19 +186,18 @@ namespace io.github.lduran2.math
 					int quotient = (digit_value >> 8);
 					remainder = (digit_value & rem_mask);
 					temp[k] = quotient;
-					if (quotient != 0)
-					{
-						found_nonzero = true;
-					}
-					else if (!found_nonzero)
+				}
+				bytes[i_byte++] = ((byte)remainder);
+				/* scan for first nonzero */
+				for (int k = off; ((k < len) && !found_nonzero); ++k)
+				{
+					found_nonzero = (temp[k] != 0);
+					if (!found_nonzero)
 					{
 						++off;
 					}
 				}
-				bytes[i_byte++] = ((byte)remainder);
-				// Console.WriteLine(bytes[i_byte - 1]);
 			}
-			// Console.WriteLine(i_byte);
 			return (i_byte, bytes);
 		}
 
@@ -193,7 +210,7 @@ namespace io.github.lduran2.math
 			int min_len, max_len;
 			byte carry = 0;
 
-			((min_len, min), (max_len, max)) = BigSum.Sort(n, m);
+			((min_len, min), (max_len, max)) = BigSum.SortByLength(n, m);
 			result_len = (max_len + 1);
 			result = new byte[result_len];
 
@@ -209,6 +226,54 @@ namespace io.github.lduran2.math
 			return (result_len, result);
 		}
 
+		public static (int len, byte[] bytes)
+			Subtract((int len, byte[] bytes) n, (int len, byte[] bytes) m)
+		{
+			int n_len, m_len, result_len;
+			byte[] n_bytes, m_bytes, result;
+			byte borrow = 0;
+
+			(n_len, n_bytes) = n;
+			(m_len, m_bytes) = m;
+			result_len = (n_len + 1);
+			result = new byte[result_len];
+
+			for (int k = 0; (k < m_len); ++k)
+			{
+				BigSum.SubBytes(out result[k], ((uint)(n_bytes[k] - m_bytes[k])), ref borrow);
+			}
+			for (int k = m_len; (k < n_len); ++k)
+			{
+				BigSum.SubBytes(out result[k], ((uint)n_bytes[k]), ref borrow);
+			}
+			result[n_len] = borrow;
+			return (result_len, result);
+		}
+
+		public static int Compare((int len, byte[] bytes) n, (int len, byte[] bytes) m)
+		{
+			int n_len, m_len;
+			byte[] n_bytes, m_bytes;
+			int comparison = 0;
+			(n_len, n_bytes) = n;
+			(m_len, m_bytes) = m;
+
+			if (n_len < m_len)
+			{
+				return -1;
+			}
+			else if (n_len > m_len)
+			{
+				return +1;
+			}
+
+			for (int k = n_len; ((k-- > 0) && (0 == comparison)); )
+			{
+				comparison = (n_bytes[k] - m_bytes[k]);
+			}
+			return comparison;
+		}
+
 		public static void AddBytes(out byte result, uint sum, ref byte carry)
 		{
 			byte new_carry = carry;
@@ -222,8 +287,21 @@ namespace io.github.lduran2.math
 			(result, carry) = (((byte)sum), new_carry);
 		}
 
+		public static void SubBytes(out byte result, uint diff, ref byte borrow)
+		{
+			byte new_borrow = borrow;
+			diff -= new_borrow;
+			new_borrow = 0;
+			if (BigSum.BYTES_RADIX <= diff)
+			{
+				diff += BigSum.BYTES_RADIX;
+				++new_borrow;
+			}
+			(result, borrow) = (((byte)diff), new_borrow);
+		}
+
 		public static ((int len, byte[] bytes) min, (int len, byte[] bytes) max)
-			Sort((int len, byte[] bytes) n, (int len, byte[] bytes) m)
+			SortByLength((int len, byte[] bytes) n, (int len, byte[] bytes) m)
 		{
 			byte[] min_bytes, max_bytes;
 			int min_len, max_len;
