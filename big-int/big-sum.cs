@@ -4,7 +4,7 @@
  * by: Leomar Durán <https://github.com/lduran2>
  * for: https://github.com/lduran2/Dark-Archives-Programming-Challenges/
  * started: 2018-12-24 t12:46
- * time:    2018-12-30 t21:40
+ * time:    2018-12-30 t21:46
  */
 using System;
 
@@ -18,9 +18,19 @@ namespace io.github.lduran2.math
 
 		public const uint BYTES_RADIX = ((uint)(Byte.MaxValue + 1));
 
+		// public static void Main(String[] argv)
+		// {
+			// BigSum.debug(argv);
+		// }
+
 		public static void Main(String[] argv)
 		{
-			BigSum.debug(argv);
+			string num0 = argv[0];
+			int radix0 = Int32.Parse(argv[1]);
+			string num1 = argv[2];
+			int radix1 = Int32.Parse(argv[3]);
+			int result_radix = Int32.Parse(argv[4]);
+			Console.WriteLine("{0}", BigSum.Add(num0, BigSum.Numeration(radix0), num1, BigSum.Numeration(radix1), BigSum.Numeration(result_radix)));
 		}
 
 		private static void debug(String[] argv)
