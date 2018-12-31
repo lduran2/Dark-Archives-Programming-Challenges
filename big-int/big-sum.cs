@@ -4,7 +4,7 @@
  * by: Leomar Durán <https://github.com/lduran2>
  * for: https://github.com/lduran2/Dark-Archives-Programming-Challenges/
  * started: 2018-12-24 t12:46
- * time:    2018-12-26 t23:39
+ * time:    2018-12-30 t21:40
  */
 using System;
 
@@ -31,36 +31,36 @@ namespace io.github.lduran2.math
 			(n_m_bytes, m_bytes) = (1, new Byte[]{255});
 			(n_p_bytes, p_bytes) = (1, new Byte[]{4});
 			(n_result_bytes, result_bytes) = BigSum.Add((n_m_bytes, m_bytes), (n_p_bytes, p_bytes));
-			Console.WriteLine("  {0}", BigSum.toString(n_m_bytes, m_bytes));
-			Console.WriteLine("+ {0}", BigSum.toString(n_p_bytes, p_bytes));
-			Console.WriteLine("= {0}", BigSum.toString(n_result_bytes, result_bytes));
+			Console.WriteLine("  {0}", BigSum.toString((n_m_bytes, m_bytes)));
+			Console.WriteLine("+ {0}", BigSum.toString((n_p_bytes, p_bytes)));
+			Console.WriteLine("= {0}", BigSum.toString((n_result_bytes, result_bytes)));
 			Console.WriteLine();
 
 			(n_m_bytes, m_bytes) = (4, new Byte[]{0xFF, 0xFF, 0xFF, 0xFF});
 			(n_p_bytes, p_bytes) = (n_m_bytes, m_bytes);
 			(n_result_bytes, result_bytes) = BigSum.Add((n_m_bytes, m_bytes), (n_p_bytes, p_bytes));
-			Console.WriteLine("  {0}", BigSum.toString(n_m_bytes, m_bytes));
-			Console.WriteLine("+ {0}", BigSum.toString(n_p_bytes, p_bytes));
-			Console.WriteLine("= {0}", BigSum.toString(n_result_bytes, result_bytes));
+			Console.WriteLine("  {0}", BigSum.toString((n_m_bytes, m_bytes)));
+			Console.WriteLine("+ {0}", BigSum.toString((n_p_bytes, p_bytes)));
+			Console.WriteLine("= {0}", BigSum.toString((n_result_bytes, result_bytes)));
 			Console.WriteLine();
 
 			(n_m_bytes, m_bytes) = (4, new Byte[]{0x12, 0x34, 0x56, 0xFF});
 			(n_p_bytes, p_bytes) = (3, new Byte[]{0xED, 0xCB, 0xA9});
 			(n_result_bytes, result_bytes) = BigSum.Add((n_m_bytes, m_bytes), (n_p_bytes, p_bytes));
-			Console.WriteLine("  {0}", BigSum.toString(n_m_bytes, m_bytes));
-			Console.WriteLine("+ {0}", BigSum.toString(n_p_bytes, p_bytes));
-			Console.WriteLine("= {0}", BigSum.toString(n_result_bytes, result_bytes));
+			Console.WriteLine("  {0}", BigSum.toString((n_m_bytes, m_bytes)));
+			Console.WriteLine("+ {0}", BigSum.toString((n_p_bytes, p_bytes)));
+			Console.WriteLine("= {0}", BigSum.toString((n_result_bytes, result_bytes)));
 			Console.WriteLine();
 
 			++p_bytes[0];
 			(n_result_bytes, result_bytes) = BigSum.Add((n_m_bytes, m_bytes), (n_p_bytes, p_bytes));
-			Console.WriteLine("  {0}", BigSum.toString(n_m_bytes, m_bytes));
-			Console.WriteLine("+ {0}", BigSum.toString(n_p_bytes, p_bytes));
-			Console.WriteLine("= {0}", BigSum.toString(n_result_bytes, result_bytes));
+			Console.WriteLine("  {0}", BigSum.toString((n_m_bytes, m_bytes)));
+			Console.WriteLine("+ {0}", BigSum.toString((n_p_bytes, p_bytes)));
+			Console.WriteLine("= {0}", BigSum.toString((n_result_bytes, result_bytes)));
 			Console.WriteLine();
 
 			/* Reminder: The byte array is little-endian. */
-			Console.WriteLine("{0}", BigSum.toString (3, new byte[]{0x87, 0xD6, 0x12}));
+			Console.WriteLine("{0}", BigSum.toString((3, new byte[]{0x87, 0xD6, 0x12})));
 			Console.WriteLine("{0}", BigSum.ToString((3, new byte[]{0x87, 0xD6, 0x12}), BigSum.Numeration(10)));
 			Console.WriteLine("{0}", BigSum.ToString((3, new byte[]{0x87, 0xD6, 0x12}), BigSum.Numeration(16)));
 			Console.WriteLine();
@@ -68,8 +68,8 @@ namespace io.github.lduran2.math
 			Console.WriteLine("{0}", BigSum.ToString((4, new byte[]{0x00, 0x00, 0x00, 0x10}), BigSum.Numeration(16)));
 			Console.WriteLine();
 
-			Console.WriteLine("{0}", BigSum.toString (3, new byte[]{69, 117, 24}));
-			Console.WriteLine("{0}", BigSum.ToString((3, new byte[]{69, 117, 24}), BigSum.Numeration(17)));
+			Console.WriteLine("{0}", BigSum.toString(BigSum.Parse("123456", BigSum.Numeration(17))));
+			Console.WriteLine("{0}", BigSum.ToString(BigSum.Parse("123456", BigSum.Numeration(17)), BigSum.Numeration(17)));
 			Console.WriteLine();
 
 			Console.WriteLine("{0}", BigSum.ToString((1, new byte[]{1}), BigSum.Numeration(2)));
@@ -78,11 +78,20 @@ namespace io.github.lduran2.math
 			Console.WriteLine();
 
 			Console.WriteLine("{0}", BigSum.Add("0", BigSum.Numeration(2), "0", BigSum.Numeration(2), BigSum.Numeration(2)));
+			Console.WriteLine();
+
+			Console.WriteLine("{0}", BigSum.ToString(BigSum.Parse("123456", BigSum.Numeration(17)), BigSum.Numeration(10)));
+			Console.WriteLine("{0}", BigSum.ToString(BigSum.Parse("123456", BigSum.Numeration(18)), BigSum.Numeration(10)));
+			Console.WriteLine("{0}", BigSum.ToString(BigSum.Parse("3721293", BigSum.Numeration(10)), BigSum.Numeration(35)));
+			Console.WriteLine("{0}", BigSum.Add("123456", BigSum.Numeration(17), "123456", BigSum.Numeration(18), BigSum.Numeration(35)));
 		}
 
-		private static string toString(int n_bytes, byte[] bytes)
+		private static string toString((int len, byte[] arr) bytes)
 		{
-			return String.Format("[{0}]", String.Join(", ", bytes));
+			int len;
+			byte[] arr;
+			(len, arr) = bytes;
+			return String.Format("[{0}]", String.Join(", ", arr));
 		}
 
 		public static (int radix, string digits) Numeration(int radix)
@@ -91,7 +100,7 @@ namespace io.github.lduran2.math
 			{
 				throw new ArgumentException(String.Format("Radix must be in [2, 36]: {0}", radix));
 			}
-			return (radix, ALPHANUMERIC_DIGITS.Substring(0, radix));
+			return (radix, ALPHANUMERIC_DIGITS);
 		}
 
 		public static string Add
@@ -112,12 +121,58 @@ namespace io.github.lduran2.math
 			);
 		}
 
-		public static (int, byte[]) Parse(string n, (int radix, string digits) numeration)
+		public static (int, byte[]) Parse(string converthand, (int radix, string digits) numeration)
 		{
-			return (1, new byte[]{0});
-		}
+			int radix;
+			string digits;
+			int len = converthand.Length;
+			int rem_mask = (int)(BYTES_RADIX - 1);
 
-		// public static {}
+			int n_bytes = (((int)(len * Math.Log(17, 256))) + 1);
+			// Console.WriteLine(n_bytes);
+			int i_byte = 0;
+			byte[] bytes = new byte[n_bytes];
+
+			int off = 0;
+			int[] temp = new int[len];
+
+			(radix, digits) = numeration;
+
+			/* first, evaluate and copy chars into a temporary array */
+			for (int k = 0; (k < len); ++k)
+			{
+				temp[k] = digits.IndexOf(converthand[k]);
+			}
+
+			/* afterward, divide each value in the temp array by 256 */
+			/* each remainder is prepended a digit before division */
+			/* the last remainder is the next least significant digit */
+			/* step up the offset for all leading zeros */
+			while (off < len)
+			{
+				bool found_nonzero = false;
+				int remainder = 0;
+				for (int k = off; (k < len); ++k)
+				{
+					int digit_value = ((remainder * radix) + temp[k]);
+					int quotient = (digit_value >> 8);
+					remainder = (digit_value & rem_mask);
+					temp[k] = quotient;
+					if (quotient != 0)
+					{
+						found_nonzero = true;
+					}
+					else if (!found_nonzero)
+					{
+						++off;
+					}
+				}
+				bytes[i_byte++] = ((byte)remainder);
+				// Console.WriteLine(bytes[i_byte - 1]);
+			}
+			// Console.WriteLine(i_byte);
+			return (i_byte, bytes);
+		}
 
 		public static (int len, byte[] bytes)
 			Add((int len, byte[] bytes) n, (int len, byte[] bytes) m)
@@ -221,7 +276,7 @@ namespace io.github.lduran2.math
 				 *	=  0,   0,   0 R 1
 				 *	-----------------------------------
 				 *	  18, 214, 135[256] = 1,234,567[10]
-				 *-----------------------------------------
+				 *	-----------------------------------------
 				 *	  1 R 8 =                        18 /10
 				 *	        = ((((   0 % 10)*256) +  18)/10)
 				 *	226 R 2 = ((((  18 % 10)*256) + 214)/10)
@@ -259,6 +314,5 @@ namespace io.github.lduran2.math
 
 			return new String(chars, i_char, (chars_len - i_char));
 		}
-
 	}
 }
